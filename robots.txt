@@ -1,0 +1,5 @@
+# 允许抓取首页，好让爬虫读到页面里的 noindex 声明。
+# 若在这里 Disallow 首页，爬虫看不到 noindex，反而可能只收录一个光秃秃的网址。
+User-agent: *
+Allow: /$
+Disallow: /resume.pdf
