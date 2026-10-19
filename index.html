@@ -57,11 +57,20 @@
     76%{transform:translate3d(calc(var(--flow-x) * .3),calc(var(--flow-y) * -.5),0) rotate(calc(var(--angle) - .2deg)) scale(.995,1.01)}
   }
   .bg canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.85}
-  .bg #flow-backdrop{z-index:0;opacity:0}
+  /* Native vector light folds: automatically animated at display resolution. */
+  .bg .flow-art{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block}
   .bg #dots{z-index:1}
-  .bg.flow-ready #flow-backdrop{opacity:1}
-  .bg.flow-ready>i,.bg.flow-ready::after{display:none}
-  .bg.flow-static i,.bg.flow-static::after{animation-play-state:paused}
+  .bg>i,.bg::after{display:none}
+  .bg-motion-btn{position:fixed;right:18px;bottom:18px;z-index:55;width:34px;height:34px;
+    display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.45);
+    color:var(--ink-3);cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  .bg-motion-btn[hidden]{display:none}
+  .bg-motion-btn:hover{background:rgba(255,255,255,.75);color:var(--ink)}
+  .bg-motion-btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .bg-motion-btn svg{width:14px;height:14px;fill:currentColor;pointer-events:none}
+  .bg-motion-btn .play-icon{display:none}
+  .bg-motion-btn[aria-pressed="false"] .pause-icon{display:none}
+  .bg-motion-btn[aria-pressed="false"] .play-icon{display:block}
   .bg::after{content:"";position:absolute;inset:-3%;animation:light-flow 57s ease-in-out infinite;animation-delay:-17s;background:
     linear-gradient(115deg,transparent 0 38%,rgba(255,255,255,.30) 46%,transparent 54%),
     linear-gradient(295deg,transparent 0 62%,rgba(255,255,255,.22) 70%,transparent 78%)}
@@ -333,7 +342,25 @@
 </style>
 </head>
 <body>
-<div class="bg" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><i class="s3"></i><i class="s1"></i><i class="s2"></i><canvas id="flow-backdrop" aria-hidden="true"></canvas><canvas id="dots" aria-hidden="true"></canvas></div>
+<div class="bg" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><i class="s3"></i><i class="s1"></i><i class="s2"></i><svg id="flow-backdrop" class="flow-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="flow-base" x1="15%" y1="0%" x2="85%" y2="100%"><stop stop-color="#e9edf3"/><stop offset=".45" stop-color="#cfd7e2"/><stop offset="1" stop-color="#b9c4d3"/></linearGradient>
+    <radialGradient id="flow-cloud"><stop stop-color="#ffffff" stop-opacity=".6"/><stop offset=".45" stop-color="#dbe6f5" stop-opacity=".38"/><stop offset="1" stop-color="#dbe6f5" stop-opacity="0"/></radialGradient>
+    <radialGradient id="flow-shade"><stop stop-color="#8ea6c9" stop-opacity=".36"/><stop offset=".45" stop-color="#a9bcd8" stop-opacity=".25"/><stop offset="1" stop-color="#a9bcd8" stop-opacity="0"/></radialGradient>
+    <linearGradient id="flow-satin" x1="0" y1="0" x2=".12" y2="1"><stop stop-color="#ffffff" stop-opacity="0"/><stop offset=".27" stop-color="#ffffff" stop-opacity=".58"/><stop offset=".6" stop-color="#a0b2cd" stop-opacity=".4"/><stop offset="1" stop-color="#a0b2cd" stop-opacity="0"/></linearGradient>
+    <linearGradient id="flow-under" x1="0" y1="0" x2=".1" y2="1"><stop stop-color="#788caf" stop-opacity="0"/><stop offset=".35" stop-color="#788caf" stop-opacity=".28"/><stop offset=".65" stop-color="#ffffff" stop-opacity=".5"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient>
+    <linearGradient id="flow-top" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffffff" stop-opacity="0"/><stop offset=".45" stop-color="#ffffff" stop-opacity=".5"/><stop offset=".75" stop-color="#8c9ebe" stop-opacity=".28"/><stop offset="1" stop-color="#8c9ebe" stop-opacity="0"/></linearGradient>
+    <filter id="flow-soft" x="-25%" y="-60%" width="150%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="16"/></filter>
+    <filter id="flow-edge" x="-25%" y="-60%" width="150%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="9"/></filter>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#flow-base)"/>
+  <ellipse cx="220" cy="100" rx="950" ry="750" fill="url(#flow-cloud)"><animateTransform attributeName="transform" type="translate" values="0 0;32 -20;-20 22;0 0" dur="23s" repeatCount="indefinite"/></ellipse>
+  <ellipse cx="1490" cy="420" rx="700" ry="700" fill="url(#flow-shade)"><animateTransform attributeName="transform" type="translate" values="0 0;-30 22;22 -18;0 0" dur="19s" repeatCount="indefinite"/></ellipse>
+<path d="M 650 -180 C 920 95 1260 -45 1840 225 L 1840 335 C 1270 85 980 210 650 -50 Z" fill="url(#flow-top)" filter="url(#flow-soft)"><animate attributeName="d" dur="18s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1" values="M 650 -180 C 920 95 1260 -45 1840 225 L 1840 335 C 1270 85 980 210 650 -50 Z;M 650 -145 C 950 135 1230 -65 1840 190 L 1840 300 C 1240 60 1000 250 650 -15 Z;M 650 -205 C 890 65 1290 -10 1840 260 L 1840 370 C 1300 120 950 180 650 -75 Z;M 650 -180 C 920 95 1260 -45 1840 225 L 1840 335 C 1270 85 980 210 650 -50 Z"/></path>
+<path d="M -280 650 C 160 435 630 770 1090 570 S 1610 410 1900 530 L 1900 690 C 1560 540 1390 780 1080 740 S 160 645 -280 810 Z" fill="url(#flow-under)" filter="url(#flow-soft)"><animate attributeName="d" dur="16s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1" values="M -280 650 C 160 435 630 770 1090 570 S 1610 410 1900 530 L 1900 690 C 1560 540 1390 780 1080 740 S 160 645 -280 810 Z;M -280 610 C 200 480 590 725 1120 620 S 1630 380 1900 490 L 1900 650 C 1580 515 1420 820 1110 785 S 180 610 -280 770 Z;M -280 680 C 130 405 670 810 1050 540 S 1570 450 1900 560 L 1900 720 C 1530 580 1350 750 1040 710 S 140 675 -280 840 Z;M -280 650 C 160 435 630 770 1090 570 S 1610 410 1900 530 L 1900 690 C 1560 540 1390 780 1080 740 S 160 645 -280 810 Z"/></path>
+<path d="M -260 370 C 200 200 550 470 940 290 S 1510 30 1870 170 L 1870 360 C 1490 210 1260 470 920 455 S 170 390 -260 540 Z" fill="url(#flow-satin)" filter="url(#flow-soft)"><animate attributeName="d" dur="12s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1" values="M -260 370 C 200 200 550 470 940 290 S 1510 30 1870 170 L 1870 360 C 1490 210 1260 470 920 455 S 170 390 -260 540 Z;M -260 330 C 250 255 560 420 970 335 S 1480 55 1870 205 L 1870 395 C 1500 245 1280 515 950 500 S 200 360 -260 500 Z;M -260 400 C 160 235 590 505 900 270 S 1530 10 1870 145 L 1870 335 C 1470 180 1220 450 880 435 S 150 425 -260 570 Z;M -260 370 C 200 200 550 470 940 290 S 1510 30 1870 170 L 1870 360 C 1490 210 1260 470 920 455 S 170 390 -260 540 Z"/></path>
+<path d="M -260 370 C 200 200 550 470 940 290 S 1510 30 1870 170" fill="none" stroke="#ffffff" stroke-opacity=".22" stroke-width="16" filter="url(#flow-edge)"><animate attributeName="d" dur="12s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1" values="M -260 370 C 200 200 550 470 940 290 S 1510 30 1870 170;M -260 330 C 250 255 560 420 970 335 S 1480 55 1870 205;M -260 400 C 160 235 590 505 900 270 S 1530 10 1870 145;M -260 370 C 200 200 550 470 940 290 S 1510 30 1870 170"/></path>
+</svg><canvas id="dots" aria-hidden="true"></canvas></div>
 
 
 
@@ -535,134 +562,27 @@
     <a class="pdf" href="resume.pdf" target="_blank" rel="noopener"><span class="cn">简历 PDF</span><span class="en">Résumé</span></a>
   </div>
 </main>
+<button type="button" id="bg-motion-btn" class="bg-motion-btn" aria-label="背景流光 / Background motion" aria-pressed="true" title="暂停背景流光 / Pause background">
+  <svg class="pause-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3h3v10H4zM9 3h3v10H9z"/></svg>
+  <svg class="play-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2.5 13 8 5 13.5z"/></svg>
+</button>
 <footer><span class="cn">© 2026 胡靓 · 使用 Claude Code 与 Codex 协作制作</span><span class="en">© 2026 Lillian Hu · Built with Claude Code &amp; Codex</span></footer>
 <script>
-  // Full-resolution flowing backdrop, independent of the foreground particle field.
+  // The user explicitly requested subtle motion: native SVG starts playing on load.
+  // Only the visible pause control stops it; other page effects retain their motion preferences.
   (function(){
-    const canvas=document.getElementById('flow-backdrop');
-    if(!canvas)return;
-    const background=canvas.closest('.bg');
-    const motion=matchMedia('(prefers-reduced-motion:reduce)');
-    let gl,program,buffer,resolution,timeUniform,ready=false,raf=0,last=0,elapsed=0,densityQuery;
-    const vertex=`attribute vec2 aPosition;
-      void main(){gl_Position=vec4(aPosition,0.0,1.0);}`;
-    const fragment=`precision highp float;
-      uniform vec2 uResolution;
-      uniform float uTime;
-      float softBand(float value,float center,float width){
-        float d=(value-center)/width;return exp(-d*d);
-      }
-      void main(){
-        vec2 uv=gl_FragCoord.xy/uResolution;
-        uv.y=1.0-uv.y;
-        float aspect=uResolution.x/uResolution.y;
-        float x=(uv.x-.5)*min(aspect,2.0);
-        float t=uTime;
-        // Original cool-grey palette; movement changes shape, never hue.
-        vec3 top=vec3(233.0,237.0,243.0)/255.0;
-        vec3 middle=vec3(207.0,215.0,226.0)/255.0;
-        vec3 bottom=vec3(185.0,196.0,211.0)/255.0;
-        float grad=clamp((uv.y+.20*uv.x)/1.20,0.0,1.0);
-        vec3 color=mix(top,middle,smoothstep(0.0,.5,grad));
-        color=mix(color,bottom,smoothstep(.5,1.0,grad));
-        vec2 cloud=uv-vec2(.88+.018*sin(t*.12),.30+.02*cos(t*.10));
-        color=mix(color,vec3(169.0,188.0,216.0)/255.0,.32*exp(-dot(cloud,cloud)*3.4));
-        vec2 light=uv-vec2(.08+.02*cos(t*.11),.12+.015*sin(t*.14));
-        color=mix(color,vec3(1.0),.30*exp(-dot(light,light)*4.0));
-        // The broad folds deform in place; light travels along their curved edges.
-        float bend=.027*sin(x*2.0+t*.22)+.014*sin(x*3.8-t*.16+1.6);
-        float fold=uv.y+.24*x+bend;
-        float width=.075+.008*sin(x*1.7-t*.18);
-        color=mix(color,vec3(160.0,178.0,205.0)/255.0,.30*softBand(fold,.43,width*1.9));
-        color=mix(color,vec3(1.0),.45*softBand(fold,.34,width));
-        color=mix(color,vec3(1.0),.20*softBand(fold,.30,.023));
-        float fold2=uv.y+.18*x-.020*sin(x*2.5-t*.19+2.2);
-        color=mix(color,vec3(120.0,140.0,175.0)/255.0,.20*softBand(fold2,.64,.10));
-        color=mix(color,vec3(1.0),.31*softBand(fold2,.72,.068));
-        float fold3=uv.y+.36*x+.018*sin(x*2.2+t*.15+.8);
-        float edgeMask=smoothstep(.25,.85,uv.x);
-        color=mix(color,vec3(140.0,158.0,190.0)/255.0,.14*edgeMask*softBand(fold3,.21,.11));
-        color=mix(color,vec3(1.0),.35*edgeMask*softBand(fold3,.14,.055));
-        // Static sub-pixel dithering prevents banding without adding visible moving dots.
-        float dither=fract(52.9829189*fract(dot(gl_FragCoord.xy,vec2(.06711056,.00583715))));
-        color+=(dither-.5)/255.0;
-        gl_FragColor=vec4(clamp(color,0.0,1.0),1.0);
-      }`;
-    const stop=()=>{if(raf)cancelAnimationFrame(raf);raf=0;last=0;};
-    const fallback=()=>{stop();ready=false;background.classList.remove('flow-ready');background.classList.add('flow-static');};
-    const shader=(type,source)=>{
-      const s=gl.createShader(type);if(!s)return null;
-      gl.shaderSource(s,source);gl.compileShader(s);
-      if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){gl.deleteShader(s);return null;}
-      return s;
+    const art=document.getElementById('flow-backdrop'),button=document.getElementById('bg-motion-btn');
+    if(!art||!button)return;
+    if(typeof art.pauseAnimations!=='function'){button.hidden=true;return;}
+    let paused=false;
+    const update=()=>{
+      if(paused)art.pauseAnimations();else art.unpauseAnimations();
+      button.setAttribute('aria-pressed',String(!paused));
+      button.title=paused?'播放背景流光 / Play background':'暂停背景流光 / Pause background';
     };
-    const draw=()=>{
-      if(!ready||gl.isContextLost())return;
-      gl.uniform1f(timeUniform,elapsed);
-      gl.drawArrays(gl.TRIANGLES,0,6);
-      background.classList.remove('flow-static');
-      background.classList.add('flow-ready');
-    };
-    const frame=now=>{
-      raf=0;
-      if(!ready||document.hidden||motion.matches)return;
-      if(!last||now-last>=1000/30-1){
-        if(last)elapsed+=Math.min(now-last,100)/1000;
-        last=now;draw();
-      }
-      raf=requestAnimationFrame(frame);
-    };
-    const sync=()=>{
-      stop();if(!ready||document.hidden)return;
-      draw();if(!motion.matches)raf=requestAnimationFrame(frame);
-    };
-    const resize=()=>{
-      if(!ready)return;
-      const w=Math.max(1,background.clientWidth),h=Math.max(1,background.clientHeight);
-      const viewport=gl.getParameter(gl.MAX_VIEWPORT_DIMS);
-      const max=gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
-      // Native display pixels, constrained only by this GPU's supported dimensions.
-      const ratio=Math.min(devicePixelRatio||1,viewport[0]/w,viewport[1]/h,max/w,max/h);
-      const width=Math.max(1,Math.floor(w*ratio)),height=Math.max(1,Math.floor(h*ratio));
-      if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
-      gl.viewport(0,0,gl.drawingBufferWidth,gl.drawingBufferHeight);
-      gl.uniform2f(resolution,gl.drawingBufferWidth,gl.drawingBufferHeight);
-      if(!document.hidden)draw();
-    };
-    const watchDensity=()=>{
-      if(densityQuery)densityQuery.removeEventListener('change',watchDensity);
-      densityQuery=matchMedia('(resolution: '+(devicePixelRatio||1)+'dppx)');
-      densityQuery.addEventListener('change',watchDensity);resize();
-    };
-    const init=()=>{
-      gl=canvas.getContext('webgl',{alpha:false,antialias:false,depth:false,stencil:false,preserveDrawingBuffer:false});
-      if(!gl){fallback();return;}
-      const vs=shader(gl.VERTEX_SHADER,vertex),fs=shader(gl.FRAGMENT_SHADER,fragment);
-      if(!vs||!fs){if(vs)gl.deleteShader(vs);if(fs)gl.deleteShader(fs);fallback();return;}
-      program=gl.createProgram();
-      if(!program){gl.deleteShader(vs);gl.deleteShader(fs);fallback();return;}
-      gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);
-      gl.deleteShader(vs);gl.deleteShader(fs);
-      if(!gl.getProgramParameter(program,gl.LINK_STATUS)){gl.deleteProgram(program);fallback();return;}
-      gl.useProgram(program);
-      buffer=gl.createBuffer();if(!buffer){gl.deleteProgram(program);fallback();return;}
-      gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
-      gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
-      const position=gl.getAttribLocation(program,'aPosition');
-      gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
-      resolution=gl.getUniformLocation(program,'uResolution');timeUniform=gl.getUniformLocation(program,'uTime');
-      gl.disable(gl.DEPTH_TEST);gl.disable(gl.BLEND);
-      ready=true;resize();sync();
-    };
-    canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();fallback();});
-    canvas.addEventListener('webglcontextrestored',init);
-    document.addEventListener('visibilitychange',sync);
-    motion.addEventListener('change',sync);
-    addEventListener('resize',resize,{passive:true});
-    if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(background);
-    init();watchDensity();
+    button.addEventListener('click',()=>{paused=!paused;update();});
+    art.setCurrentTime(0);update();
   })();
-
 
   // ── particle field: a grid of points rippling like fabric (WebGL, no library) ──
   (function(){
