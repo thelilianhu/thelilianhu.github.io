@@ -25,27 +25,47 @@
   html{scroll-behavior:smooth;color-scheme:light}
   body{font-family:var(--sans);color:var(--ink);line-height:1.7;overflow-x:hidden;
     background:#cfd6e0;min-height:100vh}
-  .bg{position:fixed;inset:0;z-index:0;overflow:hidden;
+  /* Same palette; soft layers move independently in small, continuous loops. */
+  .bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
     background:linear-gradient(160deg,#e9edf3 0%,#cfd7e2 45%,#b9c4d3 100%)}
-  .bg i{position:absolute;border-radius:50%;filter:blur(70px);opacity:.75;animation:drift 22s ease-in-out infinite alternate}
-  .bg .b1{width:62vw;height:62vw;left:-18vw;top:-22vw;background:radial-gradient(circle at 40% 40%,#ffffff 0%,#dbe6f5 45%,transparent 72%)}
-  .bg .b2{width:58vw;height:58vw;right:-20vw;top:8vh;background:radial-gradient(circle,#a9bcd8 0%,#8ea6c9 40%,transparent 72%);animation-delay:-8s}
-  .bg .b3{width:70vw;height:70vw;left:10vw;bottom:-40vw;background:radial-gradient(circle,#ffffff 0%,#c7d3e3 45%,transparent 72%);animation-delay:-14s}
-  .bg .b4{width:34vw;height:34vw;right:12vw;bottom:10vh;background:radial-gradient(circle,#7e93b8 0%,transparent 70%);opacity:.45}
-  .bg .s1,.bg .s2,.bg .s3{position:absolute;border-radius:50%;filter:blur(28px);opacity:.9;animation:sway 26s ease-in-out infinite alternate}
-  .bg .s1{width:120vw;height:34vh;left:-10vw;top:22vh;transform:rotate(-14deg);
+  .bg i{position:absolute;border-radius:50%;filter:blur(70px);opacity:.75;
+    animation:ambient-flow 46s ease-in-out infinite}
+  .bg .b1{width:62vw;height:62vw;left:-18vw;top:-22vw;background:radial-gradient(circle at 40% 40%,#ffffff 0%,#dbe6f5 45%,transparent 72%);
+    --flow-x:2vw;--flow-y:1.5vh;animation-delay:-12s}
+  .bg .b2{width:58vw;height:58vw;right:-20vw;top:8vh;background:radial-gradient(circle,#a9bcd8 0%,#8ea6c9 40%,transparent 72%);
+    --flow-x:-1.8vw;--flow-y:1.4vh;animation-duration:53s;animation-delay:-31s}
+  .bg .b3{width:70vw;height:70vw;left:10vw;bottom:-40vw;background:radial-gradient(circle,#ffffff 0%,#c7d3e3 45%,transparent 72%);
+    --flow-x:1.8vw;--flow-y:-1.4vh;animation-duration:61s;animation-delay:-24s}
+  .bg .b4{width:34vw;height:34vw;right:12vw;bottom:10vh;background:radial-gradient(circle,#7e93b8 0%,transparent 70%);opacity:.45;
+    --flow-x:-1.4vw;--flow-y:-1.2vh;animation-duration:41s;animation-delay:-7s}
+  .bg .s1,.bg .s2,.bg .s3{position:absolute;border-radius:50%;filter:blur(28px);opacity:.9;
+    transform:rotate(var(--angle));animation:ribbon-flow 34s ease-in-out infinite}
+  .bg .s1{width:120vw;height:34vh;left:-10vw;top:22vh;--angle:-14deg;--flow-x:1.2vw;--flow-y:1vh;animation-delay:-8s;
     background:linear-gradient(180deg,transparent 0%,rgba(255,255,255,.55) 35%,rgba(160,178,205,.55) 60%,transparent 100%)}
-  .bg .s2{width:110vw;height:26vh;left:-5vw;top:44vh;transform:rotate(-10deg);
-    background:linear-gradient(180deg,transparent 0%,rgba(120,140,175,.45) 40%,rgba(255,255,255,.5) 65%,transparent 100%);animation-delay:-9s}
-  .bg .s3{width:90vw;height:30vh;right:-20vw;top:6vh;transform:rotate(-22deg);
-    background:linear-gradient(180deg,transparent 0%,rgba(255,255,255,.6) 45%,rgba(140,158,190,.4) 70%,transparent 100%);animation-delay:-17s}
-  @keyframes sway{from{translate:0 0}to{translate:2vw 2vh}}
+  .bg .s2{width:110vw;height:26vh;left:-5vw;top:44vh;--angle:-10deg;--flow-x:-1vw;--flow-y:-.9vh;
+    background:linear-gradient(180deg,transparent 0%,rgba(120,140,175,.45) 40%,rgba(255,255,255,.5) 65%,transparent 100%);animation-duration:43s;animation-delay:-25s}
+  .bg .s3{width:90vw;height:30vh;right:-20vw;top:6vh;--angle:-22deg;--flow-x:-1.1vw;--flow-y:1vh;
+    background:linear-gradient(180deg,transparent 0%,rgba(255,255,255,.6) 45%,rgba(140,158,190,.4) 70%,transparent 100%);animation-duration:51s;animation-delay:-19s}
+  @keyframes ambient-flow{
+    0%,100%{transform:translate3d(0,0,0) scale(1) rotate(0deg)}
+    36%{transform:translate3d(var(--flow-x),var(--flow-y),0) scale(1.015) rotate(.25deg)}
+    72%{transform:translate3d(calc(var(--flow-x) * .25),calc(var(--flow-y) * -.6),0) scale(1.008) rotate(-.15deg)}
+  }
+  @keyframes ribbon-flow{
+    0%,100%{transform:translate3d(0,0,0) rotate(var(--angle)) scale(1,1)}
+    40%{transform:translate3d(var(--flow-x),var(--flow-y),0) rotate(calc(var(--angle) + .3deg)) scale(1.008,1.02)}
+    76%{transform:translate3d(calc(var(--flow-x) * .3),calc(var(--flow-y) * -.5),0) rotate(calc(var(--angle) - .2deg)) scale(.995,1.01)}
+  }
   .bg canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.85}
-  .bg::after{content:"";position:absolute;inset:0;background:
+  .bg::after{content:"";position:absolute;inset:-3%;animation:light-flow 57s ease-in-out infinite;animation-delay:-17s;background:
     linear-gradient(115deg,transparent 0 38%,rgba(255,255,255,.30) 46%,transparent 54%),
     linear-gradient(295deg,transparent 0 62%,rgba(255,255,255,.22) 70%,transparent 78%)}
-  @keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(4vw,3vh,0)}}
-  @media(prefers-reduced-motion:reduce){.bg i{animation:none!important}}
+  @keyframes light-flow{
+    0%,100%{transform:translate3d(-.7%,0,0) rotate(-.2deg)}
+    48%{transform:translate3d(.7%,.5%,0) rotate(.2deg)}
+  }
+  .bg.is-paused i,.bg.is-paused::after{animation-play-state:paused}
+  @media(prefers-reduced-motion:reduce){.bg i,.bg::after{animation:none!important}}
 
   /* language */
   .en{display:none} body.lang-en .en{display:revert} body.lang-en .cn{display:none}
@@ -516,8 +536,11 @@
   // ── particle field: a grid of points rippling like fabric (WebGL, no library) ──
   (function(){
     const cv=document.getElementById('dots'); if(!cv) return;
+    const pauseLayers=()=>cv.closest('.bg').classList.toggle('is-paused',document.hidden);
+    document.addEventListener('visibilitychange',pauseLayers);pauseLayers();
     const gl=cv.getContext('webgl',{alpha:true,antialias:false,premultipliedAlpha:true}); if(!gl) return;
-    const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+    const motion=matchMedia('(prefers-reduced-motion:reduce)');
+    const background=cv.closest('.bg');
     const VS=`precision highp float;
       attribute vec2 aPos; attribute vec2 aInfo;
       uniform float uTime,uAspect,uRadius,uSize,uTilt; uniform vec2 uMouse;
@@ -563,15 +586,34 @@
     const dpr=Math.min(devicePixelRatio||1,2);
     const resize=()=>{cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;gl.viewport(0,0,cv.width,cv.height);gl.uniform1f(U('uAspect'),innerWidth/innerHeight);gl.uniform1f(U('uSize'),(narrow?1.9:2.3)*dpr);};
     addEventListener('resize',resize);resize();
-    let t0=performance.now(), running=true;
-    const frame=now=>{
-      const t=(now-t0)/1000; mx+=(tx-mx)*0.05; my+=(ty-my)*0.05;
-      gl.uniform1f(U('uTime'),t); gl.uniform2f(U('uMouse'),mx,my);
+    // Keep motion continuous after a pause and cap decorative rendering at 30 fps.
+    let raf=0,last=0,time=0;
+    const draw=()=>{
+      mx+=(tx-mx)*0.08; my+=(ty-my)*0.08;
+      gl.uniform1f(U('uTime'),time*0.72); gl.uniform2f(U('uMouse'),mx,my);
       gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.POINTS,0,N);
-      if(!reduce&&running) requestAnimationFrame(frame);
     };
-    document.addEventListener('visibilitychange',()=>{running=!document.hidden; if(running&&!reduce) requestAnimationFrame(frame);});
-    requestAnimationFrame(frame);
+    const frame=now=>{
+      raf=0;
+      if(document.hidden||motion.matches)return;
+      if(!last||now-last>=1000/30){
+        if(last)time+=Math.min(now-last,100)/1000;
+        last=now;draw();
+      }
+      raf=requestAnimationFrame(frame);
+    };
+    const syncMotion=()=>{
+      if(raf)cancelAnimationFrame(raf);
+      raf=0;last=0;
+      background.classList.toggle('is-paused',document.hidden);
+      if(document.hidden)return;
+      draw();
+      if(!motion.matches)raf=requestAnimationFrame(frame);
+    };
+    document.addEventListener('visibilitychange',syncMotion);
+    motion.addEventListener('change',syncMotion);
+    addEventListener('resize',()=>{if(!document.hidden&&motion.matches)draw();});
+    syncMotion();
   })();
   let lang='cn';
   function toggleLang(){lang=(lang==='cn')?'en':'cn';document.body.classList.toggle('lang-en',lang==='en');
