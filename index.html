@@ -25,42 +25,12 @@
   html{scroll-behavior:smooth;color-scheme:light}
   body{font-family:var(--sans);color:var(--ink);line-height:1.7;overflow-x:hidden;
     background:#cfd6e0;min-height:100vh}
-  /* Same palette; soft layers move independently in small, continuous loops. */
+  /* Soft daylight from above, rendered as native animated vectors. */
   .bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
     background:linear-gradient(160deg,#e9edf3 0%,#cfd7e2 45%,#b9c4d3 100%)}
-  .bg i{position:absolute;border-radius:50%;filter:blur(70px);opacity:.75;
-    animation:ambient-flow 46s ease-in-out infinite}
-  .bg .b1{width:62vw;height:62vw;left:-18vw;top:-22vw;background:radial-gradient(circle at 40% 40%,#ffffff 0%,#dbe6f5 45%,transparent 72%);
-    --flow-x:2vw;--flow-y:1.5vh;animation-delay:-12s}
-  .bg .b2{width:58vw;height:58vw;right:-20vw;top:8vh;background:radial-gradient(circle,#a9bcd8 0%,#8ea6c9 40%,transparent 72%);
-    --flow-x:-1.8vw;--flow-y:1.4vh;animation-duration:53s;animation-delay:-31s}
-  .bg .b3{width:70vw;height:70vw;left:10vw;bottom:-40vw;background:radial-gradient(circle,#ffffff 0%,#c7d3e3 45%,transparent 72%);
-    --flow-x:1.8vw;--flow-y:-1.4vh;animation-duration:61s;animation-delay:-24s}
-  .bg .b4{width:34vw;height:34vw;right:12vw;bottom:10vh;background:radial-gradient(circle,#7e93b8 0%,transparent 70%);opacity:.45;
-    --flow-x:-1.4vw;--flow-y:-1.2vh;animation-duration:41s;animation-delay:-7s}
-  .bg .s1,.bg .s2,.bg .s3{position:absolute;border-radius:50%;filter:blur(28px);opacity:.9;
-    transform:rotate(var(--angle));animation:ribbon-flow 34s ease-in-out infinite}
-  .bg .s1{width:120vw;height:34vh;left:-10vw;top:22vh;--angle:-14deg;--flow-x:1.2vw;--flow-y:1vh;animation-delay:-8s;
-    background:linear-gradient(180deg,transparent 0%,rgba(255,255,255,.55) 35%,rgba(160,178,205,.55) 60%,transparent 100%)}
-  .bg .s2{width:110vw;height:26vh;left:-5vw;top:44vh;--angle:-10deg;--flow-x:-1vw;--flow-y:-.9vh;
-    background:linear-gradient(180deg,transparent 0%,rgba(120,140,175,.45) 40%,rgba(255,255,255,.5) 65%,transparent 100%);animation-duration:43s;animation-delay:-25s}
-  .bg .s3{width:90vw;height:30vh;right:-20vw;top:6vh;--angle:-22deg;--flow-x:-1.1vw;--flow-y:1vh;
-    background:linear-gradient(180deg,transparent 0%,rgba(255,255,255,.6) 45%,rgba(140,158,190,.4) 70%,transparent 100%);animation-duration:51s;animation-delay:-19s}
-  @keyframes ambient-flow{
-    0%,100%{transform:translate3d(0,0,0) scale(1) rotate(0deg)}
-    36%{transform:translate3d(var(--flow-x),var(--flow-y),0) scale(1.015) rotate(.25deg)}
-    72%{transform:translate3d(calc(var(--flow-x) * .25),calc(var(--flow-y) * -.6),0) scale(1.008) rotate(-.15deg)}
-  }
-  @keyframes ribbon-flow{
-    0%,100%{transform:translate3d(0,0,0) rotate(var(--angle)) scale(1,1)}
-    40%{transform:translate3d(var(--flow-x),var(--flow-y),0) rotate(calc(var(--angle) + .3deg)) scale(1.008,1.02)}
-    76%{transform:translate3d(calc(var(--flow-x) * .3),calc(var(--flow-y) * -.5),0) rotate(calc(var(--angle) - .2deg)) scale(.995,1.01)}
-  }
   .bg canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.85}
-  /* Native vector light folds: automatically animated at display resolution. */
   .bg .flow-art{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block}
   .bg #dots{z-index:1}
-  .bg>i,.bg::after{display:none}
   .bg-motion-btn{position:fixed;right:18px;bottom:18px;z-index:55;width:34px;height:34px;
     display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.45);
     color:var(--ink-3);cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
@@ -71,15 +41,6 @@
   .bg-motion-btn .play-icon{display:none}
   .bg-motion-btn[aria-pressed="false"] .pause-icon{display:none}
   .bg-motion-btn[aria-pressed="false"] .play-icon{display:block}
-  .bg::after{content:"";position:absolute;inset:-3%;animation:light-flow 57s ease-in-out infinite;animation-delay:-17s;background:
-    linear-gradient(115deg,transparent 0 38%,rgba(255,255,255,.30) 46%,transparent 54%),
-    linear-gradient(295deg,transparent 0 62%,rgba(255,255,255,.22) 70%,transparent 78%)}
-  @keyframes light-flow{
-    0%,100%{transform:translate3d(-.7%,0,0) rotate(-.2deg)}
-    48%{transform:translate3d(.7%,.5%,0) rotate(.2deg)}
-  }
-  .bg.is-paused i,.bg.is-paused::after{animation-play-state:paused}
-  @media(prefers-reduced-motion:reduce){.bg i,.bg::after{animation:none!important}}
 
   /* language */
   .en{display:none} body.lang-en .en{display:revert} body.lang-en .cn{display:none}
@@ -342,24 +303,40 @@
 </style>
 </head>
 <body>
-<div class="bg" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><i class="s3"></i><i class="s1"></i><i class="s2"></i><svg id="flow-backdrop" class="flow-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+<div class="bg" aria-hidden="true"><svg id="flow-backdrop" class="flow-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
   <defs>
-    <linearGradient id="flow-base" x1="15%" y1="0%" x2="85%" y2="100%"><stop stop-color="#e9edf3"/><stop offset=".45" stop-color="#cfd7e2"/><stop offset="1" stop-color="#b9c4d3"/></linearGradient>
-    <radialGradient id="flow-cloud"><stop stop-color="#ffffff" stop-opacity=".6"/><stop offset=".45" stop-color="#dbe6f5" stop-opacity=".38"/><stop offset="1" stop-color="#dbe6f5" stop-opacity="0"/></radialGradient>
-    <radialGradient id="flow-shade"><stop stop-color="#8ea6c9" stop-opacity=".36"/><stop offset=".45" stop-color="#a9bcd8" stop-opacity=".25"/><stop offset="1" stop-color="#a9bcd8" stop-opacity="0"/></radialGradient>
-    <linearGradient id="flow-satin" x1="0" y1="0" x2=".12" y2="1"><stop stop-color="#ffffff" stop-opacity="0"/><stop offset=".27" stop-color="#ffffff" stop-opacity=".58"/><stop offset=".6" stop-color="#a0b2cd" stop-opacity=".4"/><stop offset="1" stop-color="#a0b2cd" stop-opacity="0"/></linearGradient>
-    <linearGradient id="flow-under" x1="0" y1="0" x2=".1" y2="1"><stop stop-color="#788caf" stop-opacity="0"/><stop offset=".35" stop-color="#788caf" stop-opacity=".28"/><stop offset=".65" stop-color="#ffffff" stop-opacity=".5"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient>
-    <linearGradient id="flow-top" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffffff" stop-opacity="0"/><stop offset=".45" stop-color="#ffffff" stop-opacity=".5"/><stop offset=".75" stop-color="#8c9ebe" stop-opacity=".28"/><stop offset="1" stop-color="#8c9ebe" stop-opacity="0"/></linearGradient>
-    <filter id="flow-soft" x="-25%" y="-60%" width="150%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="16"/></filter>
-    <filter id="flow-edge" x="-25%" y="-60%" width="150%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="9"/></filter>
+    <linearGradient id="sun-base" x1="15%" y1="0%" x2="85%" y2="100%"><stop stop-color="#e9edf3"/><stop offset=".45" stop-color="#cfd7e2"/><stop offset="1" stop-color="#b9c4d3"/></linearGradient>
+    <radialGradient id="sun-air"><stop stop-color="#fffaf2" stop-opacity=".7"/><stop offset=".3" stop-color="#fffdf9" stop-opacity=".45"/><stop offset=".65" stop-color="#ffffff" stop-opacity=".16"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="sun-ray" gradientUnits="userSpaceOnUse" x1="1300" y1="-120" x2="620" y2="1100"><stop stop-color="#fffdf8" stop-opacity=".74"/><stop offset=".28" stop-color="#fffdf9" stop-opacity=".55"/><stop offset=".62" stop-color="#ffffff" stop-opacity=".22"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient>
+    <radialGradient id="sun-bounce"><stop stop-color="#ffffff" stop-opacity=".26"/><stop offset=".5" stop-color="#ffffff" stop-opacity=".12"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+    <filter id="sun-diffuse" x="-35%" y="-20%" width="170%" height="150%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="42"/></filter>
+    <filter id="sun-soft" x="-50%" y="-20%" width="200%" height="150%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="28"/></filter>
   </defs>
-  <rect width="1600" height="1000" fill="url(#flow-base)"/>
-  <ellipse cx="220" cy="100" rx="950" ry="750" fill="url(#flow-cloud)"><animateTransform attributeName="transform" type="translate" values="0 0;32 -20;-20 22;0 0" dur="23s" repeatCount="indefinite"/></ellipse>
-  <ellipse cx="1490" cy="420" rx="700" ry="700" fill="url(#flow-shade)"><animateTransform attributeName="transform" type="translate" values="0 0;-30 22;22 -18;0 0" dur="19s" repeatCount="indefinite"/></ellipse>
-<path d="M 650 -180 C 920 95 1260 -45 1840 225 L 1840 335 C 1270 85 980 210 650 -50 Z" fill="url(#flow-top)" filter="url(#flow-soft)"><animate attributeName="d" dur="18s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1" values="M 650 -180 C 920 95 1260 -45 1840 225 L 1840 335 C 1270 85 980 210 650 -50 Z;M 650 -145 C 950 135 1230 -65 1840 190 L 1840 300 C 1240 60 1000 250 650 -15 Z;M 650 -205 C 890 65 1290 -10 1840 260 L 1840 370 C 1300 120 950 180 650 -75 Z;M 650 -180 C 920 95 1260 -45 1840 225 L 1840 335 C 1270 85 980 210 650 -50 Z"/></path>
-<path d="M -280 650 C 160 435 630 770 1090 570 S 1610 410 1900 530 L 1900 690 C 1560 540 1390 780 1080 740 S 160 645 -280 810 Z" fill="url(#flow-under)" filter="url(#flow-soft)"><animate attributeName="d" dur="16s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1" values="M -280 650 C 160 435 630 770 1090 570 S 1610 410 1900 530 L 1900 690 C 1560 540 1390 780 1080 740 S 160 645 -280 810 Z;M -280 610 C 200 480 590 725 1120 620 S 1630 380 1900 490 L 1900 650 C 1580 515 1420 820 1110 785 S 180 610 -280 770 Z;M -280 680 C 130 405 670 810 1050 540 S 1570 450 1900 560 L 1900 720 C 1530 580 1350 750 1040 710 S 140 675 -280 840 Z;M -280 650 C 160 435 630 770 1090 570 S 1610 410 1900 530 L 1900 690 C 1560 540 1390 780 1080 740 S 160 645 -280 810 Z"/></path>
-<path d="M -260 370 C 200 200 550 470 940 290 S 1510 30 1870 170 L 1870 360 C 1490 210 1260 470 920 455 S 170 390 -260 540 Z" fill="url(#flow-satin)" filter="url(#flow-soft)"><animate attributeName="d" dur="12s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1" values="M -260 370 C 200 200 550 470 940 290 S 1510 30 1870 170 L 1870 360 C 1490 210 1260 470 920 455 S 170 390 -260 540 Z;M -260 330 C 250 255 560 420 970 335 S 1480 55 1870 205 L 1870 395 C 1500 245 1280 515 950 500 S 200 360 -260 500 Z;M -260 400 C 160 235 590 505 900 270 S 1530 10 1870 145 L 1870 335 C 1470 180 1220 450 880 435 S 150 425 -260 570 Z;M -260 370 C 200 200 550 470 940 290 S 1510 30 1870 170 L 1870 360 C 1490 210 1260 470 920 455 S 170 390 -260 540 Z"/></path>
-<path d="M -260 370 C 200 200 550 470 940 290 S 1510 30 1870 170" fill="none" stroke="#ffffff" stroke-opacity=".22" stroke-width="16" filter="url(#flow-edge)"><animate attributeName="d" dur="12s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1" values="M -260 370 C 200 200 550 470 940 290 S 1510 30 1870 170;M -260 330 C 250 255 560 420 970 335 S 1480 55 1870 205;M -260 400 C 160 235 590 505 900 270 S 1530 10 1870 145;M -260 370 C 200 200 550 470 940 290 S 1510 30 1870 170"/></path>
+  <rect width="1600" height="1000" fill="url(#sun-base)"/>
+  <!-- A light source beyond the upper edge creates ambient daylight, without a visible sun disc. -->
+  <ellipse cx="1370" cy="-120" rx="970" ry="850" fill="url(#sun-air)" opacity=".88">
+    <animate attributeName="opacity" values=".88;.64;.96;.88" dur="19s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;-32 20;0 0" dur="22s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".4 0 .6 1;.4 0 .6 1"/>
+  </ellipse>
+  <!-- Straight, widening shafts dissolve into the lower page; only their lighting shifts. -->
+  <g opacity=".76">
+    <animate attributeName="opacity" values=".76;.98;.6;.76" dur="14s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1"/>
+    <animateTransform attributeName="transform" type="rotate" values="0 1370 -220;1.4 1370 -220;-.8 1370 -220;0 1370 -220" dur="18s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1"/>
+    <path d="M 1170 -260 L 1430 -260 L 780 1270 L -100 1270 Z" fill="url(#sun-ray)" filter="url(#sun-diffuse)"/>
+  </g>
+  <g opacity=".38">
+    <animate attributeName="opacity" values=".38;.62;.28;.38" dur="17s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1"/>
+    <animateTransform attributeName="transform" type="rotate" values="0 1370 -220;-.9 1370 -220;.5 1370 -220;0 1370 -220" dur="23s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1"/>
+    <path d="M 1400 -260 L 1490 -260 L 1410 1270 L 950 1270 Z" fill="url(#sun-ray)" filter="url(#sun-soft)"/>
+  </g>
+  <g opacity=".26">
+    <animate attributeName="opacity" values=".26;.13;.36;.26" dur="20s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1"/>
+    <path d="M 1060 -260 L 1130 -260 L 40 1080 L -400 1080 Z" fill="url(#sun-ray)" filter="url(#sun-diffuse)"/>
+  </g>
+  <ellipse cx="400" cy="750" rx="760" ry="520" fill="url(#sun-bounce)" opacity=".6">
+    <animate attributeName="opacity" values=".6;.85;.45;.6" dur="16s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.333333;.666667;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;-30 18;0 0" dur="21s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".4 0 .6 1;.4 0 .6 1"/>
+  </ellipse>
 </svg><canvas id="dots" aria-hidden="true"></canvas></div>
 
 
@@ -562,7 +539,7 @@
     <a class="pdf" href="resume.pdf" target="_blank" rel="noopener"><span class="cn">简历 PDF</span><span class="en">Résumé</span></a>
   </div>
 </main>
-<button type="button" id="bg-motion-btn" class="bg-motion-btn" aria-label="背景流光 / Background motion" aria-pressed="true" title="暂停背景流光 / Pause background">
+<button type="button" id="bg-motion-btn" class="bg-motion-btn" aria-label="背景日光 / Background daylight" aria-pressed="true" title="暂停日光微动 / Pause daylight">
   <svg class="pause-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3h3v10H4zM9 3h3v10H9z"/></svg>
   <svg class="play-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2.5 13 8 5 13.5z"/></svg>
 </button>
@@ -578,7 +555,7 @@
     const update=()=>{
       if(paused)art.pauseAnimations();else art.unpauseAnimations();
       button.setAttribute('aria-pressed',String(!paused));
-      button.title=paused?'播放背景流光 / Play background':'暂停背景流光 / Pause background';
+      button.title=paused?'播放日光微动 / Play daylight':'暂停日光微动 / Pause daylight';
     };
     button.addEventListener('click',()=>{paused=!paused;update();});
     art.setCurrentTime(0);update();
