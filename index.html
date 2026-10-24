@@ -470,6 +470,15 @@
     .top nav{min-width:0;width:100%}
     .top nav a{font-size:clamp(10px,2.8vw,12px);padding:9px 1px;min-height:38px}
   }
+
+  /* Case heading and navigation above the demo, never over the picture. */
+  .proj-cover.cover-cases{position:relative;padding-top:38px}
+  .cover-cases .slide{display:flex;flex-direction:column}
+  .cover-cases .slide .cap{order:-1;min-height:78px;border-top:0;border-bottom:1px solid rgba(24,32,51,.06);padding:3px 16px 12px;background:rgba(255,255,255,.72)}
+  .cover-cases .dots{position:absolute;top:0;right:0;left:0;grid-area:auto;justify-content:flex-end;gap:3px;padding:4px 10px 2px;height:38px;z-index:4;background:rgba(255,255,255,.72)}
+  @media(max-width:600px){
+    .cover-cases .slide .cap{min-height:88px;padding:3px 14px 12px}
+  }
 </style>
 </head>
 <body>
