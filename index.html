@@ -501,6 +501,12 @@
     .g{scroll-margin-top:calc(var(--mobile-nav-height,70px) + 18px)}
     .top nav a{-webkit-tap-highlight-color:transparent}
   }
+
+  @media(max-width:860px){
+    .top{grid-template-columns:var(--nav-avatar-size,50px) minmax(0,1fr) var(--nav-avatar-size,50px);align-items:center}
+    .top .me{align-self:center;line-height:1}
+    .top .me .slot{width:var(--nav-avatar-size,50px);height:var(--nav-avatar-size,50px)}
+  }
 </style>
 </head>
 <body>
@@ -979,7 +985,8 @@
   heroAv.style.margin='0';
   heroAv.style.transformOrigin='0 0';
   const measure=()=>{
-    const h=Math.min(innerWidth<=860?36:44,pill.offsetHeight);
+    const h=innerWidth<=860?pill.offsetHeight:Math.min(44,pill.offsetHeight);
+    document.documentElement.style.setProperty('--nav-avatar-size',h+'px');
     slot.style.width=slot.style.height=h+'px';
     const r=hold.getBoundingClientRect();
     geo={x:r.left+scrollX,y:r.top+scrollY,size:r.width};
@@ -988,10 +995,11 @@
   const onScroll=()=>{
     avatarFrame=0;if(!geo)return;
     const sr=slot.getBoundingClientRect(),pr=pill.getBoundingClientRect();
+    const targetY=pr.top+(pr.height-sr.width)/2;
     const naturalX=geo.x-scrollX,naturalY=geo.y-scrollY;
     // Start only when the full-size circle approaches the navigation's lower edge.
     const start=pr.bottom+12;
-    const distance=Math.max(1,start+geo.size-(sr.top+sr.width));
+    const distance=Math.max(1,start+geo.size-(targetY+sr.width));
     const t=clamp((start-naturalY)/distance);
     const sizeProgress=reduce.matches?t:smooth(t/.68);
     const sideProgress=reduce.matches?t:smooth(t/.55);
@@ -1007,8 +1015,8 @@
     }
     if(pinned){
       // At rest, follow the live sticky navigation geometry without changing positioning mode.
-      heroAv.style.transform=`translate3d(${sr.left}px,${sr.top}px,0) scale(${sr.width/geo.size})`;
-      nm.style.left=(sr.right+10)+'px';nm.style.top=sr.top+'px';nm.style.height=sr.height+'px';
+      heroAv.style.transform=`translate3d(${sr.left}px,${targetY}px,0) scale(${sr.width/geo.size})`;
+      nm.style.left=(sr.right+10)+'px';nm.style.top=targetY+'px';nm.style.height=sr.height+'px';
       nm.style.maxWidth=Math.max(0,pr.left-sr.right-24)+'px';
     }
   };
