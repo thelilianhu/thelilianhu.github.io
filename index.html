@@ -804,7 +804,7 @@
     const background=cv.closest('.bg');
     const VS=`precision highp float;
       attribute vec2 aPos; attribute vec2 aInfo;
-      uniform float uTime,uAspect,uRadius,uSize,uTilt; uniform vec2 uMouse;
+      uniform float uTime,uAspect,uRadius,uSize,uTilt,uStrength,uPulseAge; uniform vec2 uMouse,uPulse;
       varying float vA;
       void main(){
         vec3 p=vec3(aPos,0.0);
@@ -812,13 +812,22 @@
         float rad=uTime*0.12+(p.x+2.0*p.y)*2.2+aInfo.y*0.6;
         float z=sin(rad)*uRadius*mix(0.55,1.0,aInfo.y);
         z+=sin(uTime*0.07+p.x*1.1-p.y*1.6)*uRadius*0.35;
-        float md=distance(p.xy,uMouse); z+=0.06*exp(-md*md*9.0);
+        // Pointer interaction is applied after projection, in screen coordinates.
         // tilt the sheet away from the viewer for perspective folds
         float c=cos(uTilt),s=sin(uTilt);
         float y=p.y*c-z*s, d=p.y*s+z*c;
         float depth=2.4-d;
         vec2 q=vec2(p.x,y+0.7)/depth*1.45;
         q.x/=uAspect;
+        vec2 delta=vec2((q.x-uMouse.x)*uAspect,q.y-uMouse.y);
+        float md=length(delta);
+        float influence=exp(-md*md/0.055)*uStrength;
+        vec2 push=delta/max(md,0.015)*influence*0.075;
+        vec2 rippleDelta=vec2((q.x-uPulse.x)*uAspect,q.y-uPulse.y);
+        float rd=length(rippleDelta);
+        float ring=exp(-pow((rd-uPulseAge*0.55)/0.065,2.0))*exp(-uPulseAge*2.2)*step(0.0,uPulseAge);
+        vec2 wave=rippleDelta/max(rd,0.015)*ring*0.035;
+        q+=vec2((push.x+wave.x)/uAspect,push.y+wave.y);
         gl_Position=vec4(q,0.0,1.0);
         // density field in screen space: slow drifting bands, like the light on the wall — dense here, sparse there
         vec2 sc=vec2(q.x*uAspect,q.y);
@@ -827,7 +836,7 @@
         float vis=smoothstep(h-0.22,h+0.22,dn);          // sparse where the field is low
         float inL=mix(0.12,1.0,dn)*vis;
         gl_PointSize=mix(uSize,uSize*0.35,aInfo.x)*(2.6/depth)*mix(0.8,1.3,dn);
-        vA=(0.45+0.55*(0.5+0.5*sin(rad)))*(1.0-aInfo.x*0.5)*inL;
+        vA=min(1.0,(0.45+0.55*(0.5+0.5*sin(rad)))*(1.0-aInfo.x*0.5)*inL+influence*0.28+ring*0.18);
       }`;
     const FS=`precision mediump float; varying float vA; uniform vec3 uColor;
       void main(){ vec2 c=gl_PointCoord-0.5; float r=dot(c,c); if(r>0.25) discard; float a=vA*smoothstep(0.25,0.08,r);
@@ -842,22 +851,30 @@
     const U=n=>gl.getUniformLocation(prog,n);
     gl.uniform3f(U('uColor'),1.0,1.0,1.0); gl.uniform1f(U('uRadius'),0.14); gl.uniform1f(U('uTilt'),0.5);
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA); gl.disable(gl.DEPTH_TEST);
-    let mx=0,my=0,tx=0,ty=0;
-    addEventListener('pointermove',e=>{tx=(e.clientX/innerWidth)*2.6-1.3;ty=-((e.clientY/innerHeight)*2.4-1.2);},{passive:true});
+    let mx=0,my=0,tx=0,ty=0,strength=0,targetStrength=0,pulseX=0,pulseY=0,pulseAt=-10000;
+    const updatePointer=e=>{tx=e.clientX/innerWidth*2-1;ty=1-e.clientY/innerHeight*2;targetStrength=1;};
+    addEventListener('pointermove',updatePointer,{passive:true});
+    addEventListener('pointerdown',e=>{updatePointer(e);pulseX=tx;pulseY=ty;pulseAt=performance.now();},{passive:true});
+    addEventListener('pointerup',e=>{if(e.pointerType!=='mouse')targetStrength=0;},{passive:true});
+    addEventListener('pointercancel',()=>{targetStrength=0;},{passive:true});
+    document.documentElement.addEventListener('pointerleave',()=>{targetStrength=0;},{passive:true});
+    addEventListener('blur',()=>{targetStrength=0;});
     const dpr=Math.min(devicePixelRatio||1,2);
     const resize=()=>{cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;gl.viewport(0,0,cv.width,cv.height);gl.uniform1f(U('uAspect'),innerWidth/innerHeight);gl.uniform1f(U('uSize'),(narrow?1.9:2.3)*dpr);};
     addEventListener('resize',resize);resize();
     // Keep motion continuous after a pause and cap decorative rendering at 30 fps.
     let raf=0,last=0,time=0;
     const draw=()=>{
-      mx+=(tx-mx)*0.08; my+=(ty-my)*0.08;
+      mx+=(tx-mx)*0.18; my+=(ty-my)*0.18;strength+=(targetStrength-strength)*0.12;
       gl.uniform1f(U('uTime'),time*0.72); gl.uniform2f(U('uMouse'),mx,my);
+      gl.uniform1f(U('uStrength'),motion.matches?0:strength);
+      gl.uniform2f(U('uPulse'),pulseX,pulseY);gl.uniform1f(U('uPulseAge'),motion.matches?10:(performance.now()-pulseAt)/1000);
       gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.POINTS,0,N);
     };
     const frame=now=>{
       raf=0;
       if(document.hidden||motion.matches)return;
-      if(!last||now-last>=1000/30){
+      if(!last||now-last>=1000/(narrow?30:60)){
         if(last)time+=Math.min(now-last,100)/1000;
         last=now;draw();
       }
