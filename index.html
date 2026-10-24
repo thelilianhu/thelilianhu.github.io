@@ -73,7 +73,8 @@
   .top .pill::-webkit-scrollbar{display:none}
   .top nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;flex:1;min-width:0}
   .top nav a{display:flex;align-items:center;justify-content:center;text-align:center;color:var(--ink-2);text-decoration:none;font-size:14px;font-weight:600;padding:9px 10px;border-radius:999px;transition:.15s;white-space:nowrap;min-width:0}
-  .top nav a:hover,.top nav a.active{background:rgba(255,255,255,.7);color:var(--ink)}
+  .top nav a.active{background:rgba(255,255,255,.7);color:var(--ink)}
+  @media(hover:hover) and (pointer:fine){.top nav a:hover{background:rgba(255,255,255,.7);color:var(--ink)}}
   .ib{width:56px;height:56px;border-radius:50%;font-size:13px;border:1px solid var(--line);background:var(--glass-strong);flex:none;
     display:grid;place-items:center;cursor:pointer;font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--ink);
     box-shadow:0 6px 20px rgba(24,32,51,.10);backdrop-filter:blur(18px)}
@@ -487,6 +488,19 @@
   .cover-cases .dots i::after{background:rgba(24,32,51,.16)}
   .cover-cases .dots i.on::after{background:rgba(24,32,51,.48)}
   @media(max-width:600px){.cover-cases .slide .cap{min-height:0;padding:9px 14px 34px;line-height:1.5}}
+
+  /* Mobile uses a fixed bar with an equal-height spacer, independent of sticky support. */
+  .mobile-nav-spacer{display:none}
+  @media(max-width:860px){
+    .top{position:fixed;left:14px;right:14px;top:0;margin:0;padding-top:calc(8px + env(safe-area-inset-top,0px));padding-bottom:12px;z-index:70}
+    .mobile-nav-spacer{display:block;height:var(--mobile-nav-height,70px)}
+    .top::before{opacity:1}
+    .hero-l .portrait{z-index:75}
+    #navName{z-index:74}
+    html{scroll-padding-top:calc(var(--mobile-nav-height,70px) + 18px)}
+    .g{scroll-margin-top:calc(var(--mobile-nav-height,70px) + 18px)}
+    .top nav a{-webkit-tap-highlight-color:transparent}
+  }
 </style>
 </head>
 <body>
@@ -933,14 +947,23 @@
   let lang='cn';
   const navEl=document.getElementById('nav');
   const topEl=document.getElementById('top-nav');
+  const navSpacer=document.createElement('div');navSpacer.className='mobile-nav-spacer';navSpacer.setAttribute('aria-hidden','true');topEl.after(navSpacer);
+  const measureNav=()=>document.documentElement.style.setProperty('--mobile-nav-height',Math.ceil(topEl.getBoundingClientRect().height)+'px');
+  new ResizeObserver(measureNav).observe(topEl);measureNav();
   const stuck=()=>topEl.classList.toggle('stuck',scrollY>40);addEventListener('scroll',stuck,{passive:true});stuck();
   // reveal
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.08});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   // scroll-spy
   const links=[...navEl.querySelectorAll('a')];const secs=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
-  const spy=()=>{let cur=secs[0];for(const s of secs){if(s.getBoundingClientRect().top<=innerHeight*.45)cur=s;}
-    links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur.id));};
+  let clickedSection=null,clickedUntil=0;
+  const selectNav=id=>links.forEach(a=>{const selected=a.getAttribute('href')==='#'+id;a.classList.toggle('active',selected);if(selected)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current');});
+  links.forEach(a=>a.addEventListener('click',()=>{clickedSection=a.getAttribute('href').slice(1);clickedUntil=performance.now()+1200;selectNav(clickedSection);}));
+  const spy=()=>{
+    if(clickedSection&&performance.now()<clickedUntil){selectNav(clickedSection);return;}
+    clickedSection=null;let cur=secs[0];for(const sec of secs){if(sec.getBoundingClientRect().top<=innerHeight*.45)cur=sec;}
+    if(cur)selectNav(cur.id);
+  };
   addEventListener('scroll',spy,{passive:true});spy();
   // Keep the original portrait in one composited layer throughout the journey.
   const heroAv=document.querySelector('.hero-l .portrait'),heroH1=document.querySelector('.hero-l h1'),slot=document.getElementById('navSlot'),pill=topEl.querySelector('.pill');
