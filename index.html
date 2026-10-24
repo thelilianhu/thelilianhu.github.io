@@ -507,6 +507,9 @@
     .top .me{align-self:center;line-height:1}
     .top .me .slot{width:var(--nav-avatar-size,50px);height:var(--nav-avatar-size,50px)}
   }
+
+  /* Match portrait and navigation outlines, including during avatar scaling. */
+  .hero-l .portrait,.top .pill{border:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -1006,6 +1009,7 @@
     // Bottom anchoring keeps the scaled circle on the same continuous path.
     const y=naturalY+geo.size*(1-scale);
     heroAv.style.transform=`translate3d(${x}px,${y}px,0) scale(${scale})`;
+    heroAv.style.borderWidth=(1/scale)+'px';
     const nowPinned=t>=1;
     if(nowPinned!==pinned){
       pinned=nowPinned;heroAv.classList.toggle('pinned',pinned);
@@ -1014,6 +1018,7 @@
     if(pinned){
       // At rest, follow the live sticky navigation geometry without changing positioning mode.
       heroAv.style.transform=`translate3d(${sr.left}px,${targetY}px,0) scale(${sr.width/geo.size})`;
+      heroAv.style.borderWidth=(geo.size/sr.width)+'px';
       nm.style.left=(sr.right+10)+'px';nm.style.top=targetY+'px';nm.style.height=sr.height+'px';
       nm.style.maxWidth=Math.max(0,pr.left-sr.right-24)+'px';
     }
