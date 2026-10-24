@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>document.documentElement.classList.add("avatar-boot");</script>
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
@@ -516,6 +517,10 @@
   .top .me{align-self:center;line-height:1}
   .top .me .slot{width:var(--nav-avatar-size,56px);height:var(--nav-avatar-size,56px)}
   @media(max-width:860px){.top{grid-template-columns:var(--nav-avatar-size,50px) minmax(0,1fr) var(--nav-avatar-size,50px)}}
+
+  /* Wait for restored scroll position before revealing the portrait. */
+  html.avatar-boot{scroll-behavior:auto!important}
+  html.avatar-boot .hero-l .portrait,html.avatar-boot #navName{visibility:hidden}
 </style>
 </head>
 <body>
@@ -1031,11 +1036,18 @@
   };
   const scheduleAvatar=()=>{if(!avatarFrame)avatarFrame=requestAnimationFrame(onScroll);};
   heroAv.addEventListener('click',()=>{if(pinned)scrollTo({top:0,behavior:reduce.matches?'auto':'smooth'})});
-  window.__remeasure=()=>{measure();scheduleAvatar();};
+  window.__remeasure=()=>{if(avatarFrame)cancelAnimationFrame(avatarFrame);avatarFrame=0;measure();onScroll();};
   measure();onScroll();
   addEventListener('scroll',scheduleAvatar,{passive:true});
   addEventListener('resize',window.__remeasure);
-  addEventListener('pageshow',window.__remeasure);
+  const revealRestoredAvatar=()=>{
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      window.__remeasure();
+      document.documentElement.classList.remove('avatar-boot');
+    }));
+  };
+  addEventListener('pageshow',revealRestoredAvatar);
+  if(document.readyState==='complete')revealRestoredAvatar();
   if(window.visualViewport)window.visualViewport.addEventListener('resize',window.__remeasure);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(window.__remeasure);
   // about card: it SINKS, it does not lift. The point under the pointer goes away, the far side comes up;
