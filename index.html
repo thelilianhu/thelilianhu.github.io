@@ -452,8 +452,9 @@
   }
 
   /* Keep case navigation outside the video and caption. */
+  .cover-cases .cap{padding-bottom:3px}
   .cover-cases .slide{grid-area:1 / 1}
-  .cover-cases .dots{position:static;grid-area:2 / 1;justify-self:stretch;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 14px 12px;background:rgba(255,255,255,.72);z-index:auto}
+  .cover-cases .dots{position:static;grid-area:2 / 1;justify-self:stretch;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 14px 5px;background:rgba(255,255,255,.72);z-index:auto}
   .cover-cases .dots i{position:relative;width:28px;height:28px;border:0;background:transparent;flex:none;border-radius:50%}
   .cover-cases .dots i::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:5px;height:5px;border-radius:50%;background:rgba(24,32,51,.24);transition:background .2s}
   .cover-cases .dots i.on{width:28px;background:transparent;border-radius:50%}
