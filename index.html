@@ -23,7 +23,7 @@
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{scroll-behavior:smooth;color-scheme:light}
-  body{font-family:var(--sans);color:var(--ink);line-height:1.7;overflow-x:hidden;
+  body{font-family:var(--sans);color:var(--ink);line-height:1.7;overflow-x:clip;
     background:#cfd6e0;min-height:100vh}
   /* Soft daylight from above, rendered as native animated vectors. */
   .bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
@@ -456,6 +456,17 @@
   .cover-cases .dots{position:static;grid-area:2 / 1;justify-self:stretch;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 14px 12px;background:rgba(255,255,255,.72);z-index:auto}
   .cover-cases .dots i{width:28px;height:28px;border:10px solid transparent;flex:none;background-clip:content-box}
   .cover-cases .dots i.on{width:40px;border-radius:14px}
+
+  /* Do not create an overflow scroll ancestor: it prevents mobile sticky headers. */
+  @supports not (overflow:clip){body{overflow-x:visible}}
+  .top{position:-webkit-sticky;position:sticky}
+  @media(max-width:860px){
+    .top{top:0;top:env(safe-area-inset-top,0px);grid-template-columns:36px minmax(0,1fr) 36px;column-gap:6px}
+    .top .me .slot{width:36px;height:36px}
+    .top .pill{min-width:0;overflow-x:visible}
+    .top nav{min-width:0;width:100%}
+    .top nav a{font-size:clamp(10px,2.8vw,12px);padding:9px 1px;min-height:38px}
+  }
 </style>
 </head>
 <body>
@@ -923,7 +934,7 @@
   heroAv.style.margin='0';
   heroAv.style.transformOrigin='0 0';
   const measure=()=>{
-    const h=Math.min(44,pill.offsetHeight);
+    const h=Math.min(innerWidth<=860?36:44,pill.offsetHeight);
     slot.style.width=slot.style.height=h+'px';
     const r=hold.getBoundingClientRect();
     geo={x:r.left+scrollX,y:r.top+scrollY,size:r.width};
@@ -962,6 +973,8 @@
   measure();onScroll();
   addEventListener('scroll',scheduleAvatar,{passive:true});
   addEventListener('resize',window.__remeasure);
+  addEventListener('pageshow',window.__remeasure);
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',window.__remeasure);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(window.__remeasure);
   // about card: it SINKS, it does not lift. The point under the pointer goes away, the far side comes up;
   // the darkest spot tracks the pointer, the rim opposite catches light, and the shadow tightens.
