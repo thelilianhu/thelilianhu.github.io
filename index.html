@@ -479,6 +479,14 @@
   @media(max-width:600px){
     .cover-cases .slide .cap{min-height:88px;padding:3px 14px 12px}
   }
+
+  /* Navigation sits between the case description and video. */
+  .proj-cover.cover-cases{padding-top:0}
+  .cover-cases .slide .cap{min-height:0;padding:10px 16px 35px;gap:2px;border-bottom:0;line-height:1.5}
+  .cover-cases .dots{top:var(--case-caption-height,96px);bottom:auto;left:0;right:0;transform:translateY(-31px);height:28px;padding:0;justify-content:center;gap:3px;background:transparent}
+  .cover-cases .dots i::after{background:rgba(24,32,51,.16)}
+  .cover-cases .dots i.on::after{background:rgba(24,32,51,.48)}
+  @media(max-width:600px){.cover-cases .slide .cap{min-height:0;padding:9px 14px 34px;line-height:1.5}}
 </style>
 </head>
 <body>
@@ -1033,8 +1041,10 @@
   // cases carousel: play each clip, advance when it ends
   const cases=document.getElementById('cases');
   if(cases){const slides=[...cases.querySelectorAll('.slide')],dots=[...cases.querySelectorAll('.dots i')];let i=0;
+    const sizeCaseCaption=()=>{const cap=slides[i].querySelector('.cap');cases.style.setProperty('--case-caption-height',cap.getBoundingClientRect().height+'px');};
+    const caseResize=new ResizeObserver(sizeCaseCaption);slides.forEach(s=>caseResize.observe(s.querySelector('.cap')));sizeCaseCaption();
     const show=n=>{slides[i].classList.remove('on');dots[i].classList.remove('on');slides[i].querySelector('video').pause();
-      i=n%slides.length;slides[i].classList.add('on');dots[i].classList.add('on');const v=slides[i].querySelector('video');v.currentTime=0;v.play().catch(()=>{});};
+      i=n%slides.length;slides[i].classList.add('on');dots[i].classList.add('on');sizeCaseCaption();const v=slides[i].querySelector('video');v.currentTime=0;v.play().catch(()=>{});};
     slides.forEach((s,k)=>{const v=s.querySelector('video');v.addEventListener('ended',()=>show(k+1));});
     dots.forEach((d,k)=>d.addEventListener('click',()=>show(k)));
     const vio=new IntersectionObserver(es=>{es.forEach(e=>{const v=slides[i].querySelector('video');if(e.isIntersecting){v.play().catch(()=>{})}else{v.pause()}})},{threshold:.3});
